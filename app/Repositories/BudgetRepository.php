@@ -5,35 +5,22 @@ use App\Models\Budget;
 use App\Repositories\Interfaces\BudgetRepositoryInterface;
 
 class BudgetRepository implements BudgetRepositoryInterface {
-    public function all(): iterable {
-        return Budget::all();
-    }
-
-    public function findById( int $id ): ?Budget {
-        return Budget::find( $id );
-    }
-
-    public function create( array $data ): ?Budget {
+    public function createBudget( array $data ): ?Budget {
         return Budget::create( $data );
     }
 
-    public function update( int $id, array $data ): bool {
-        $budget = Budget::find( $id );
-        return $budget ? $budget->update( $data ): false;
-    }
-
-    public function delete( int $id ): bool {
-        $budget = Budget::find( $id );
-        return $budget ? $budget->delete(): false;
-    }
-
-    public function findByUserIdAndMonth( int $userId, int $month ): ?Budget {
+    public function existsBudgetForMonth( int $userId, int $month, int $year ): bool {
         return Budget::where( 'user_id', $userId )
         ->where( 'month', $month )
-        ->first();
+        ->where( 'year', $year )
+        ->exists();
     }
 
-    public function findByUserId( int $userId ): ?Budget {
-        return Budget::where( 'user_id', $userId )->first();
+    public function getBudgetsByUserId( int $userId ): array {
+        return Budget::where( 'user_id', $userId )
+        ->orderBy( 'year', 'desc' )
+        ->orderBy( 'month', 'desc' )
+        ->get()
+        ->toArray();
     }
 }
