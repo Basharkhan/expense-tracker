@@ -27,7 +27,7 @@ class UserController extends Controller {
                 'success' => true,
                 'data' => $users,
                 'message' => 'Users fetched successfully',
-            ] );
+            ], Response::HTTP_OK );
         } catch ( Exception $e ) {
             return response()->json( [
                 'success' => false,

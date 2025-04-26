@@ -3,74 +3,74 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\BudgetService;
-use Exception;
-use Illuminate\Http\JsonResponse;
+use App\Services\ExpenseService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
+use Exception;
+use Illuminate\Http\JsonResponse;
 
-class BudgetController extends Controller {
-    public function __construct( protected BudgetService $budgetService ) {
+class ExpenseController extends Controller {
+    public function __construct( protected ExpenseService $expenseService ) {
     }
 
     /**
-    * Create a new budget.
+    * Create a new expense.
     */
 
     public function store( Request $request ): JsonResponse {
+
         try {
             $validatedData = $request->validate( [
                 'amount' => 'required|numeric|min:0|decimal:2|max:99999999.99',
-                'month' => 'required|integer|between:1,12',
-                'year' => 'required|integer|digits:4|min:1900|max:' . ( date( 'Y' ) + 5 )
+                'category' => 'required|string|max:255',
+                'date' => 'required|date_format:Y-m-d',
+                'description' => 'nullable|string|max:255',
             ] );
 
             $userId = auth()->id();
-            $budget = $this->budgetService->createBudget( $userId, $validatedData );
+            $expense = $this->expenseService->createExpense( $userId, $validatedData );
 
             return response()->json( [
                 'success' => true,
-                'data' => $budget,
-                'message' => 'Budget created successfully',
+                'data' => $expense,
+                'message' => 'Expense created successfully',
             ], Response::HTTP_CREATED );
-        } catch( ValidationException $e ) {
+        } catch ( ValidationException $e ) {
             return response()->json( [
                 'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
             ], Response::HTTP_UNPROCESSABLE_ENTITY );
-        } catch( Exception $e ) {
+        } catch ( Exception $e ) {
             return response()->json( [
                 'success' => false,
-                'message' => 'Failed to create budget',
+                'message' => 'Failed to create expense',
                 'error' => config( 'app.debug' ) ? $e->getMessage() : null
             ], Response::HTTP_INTERNAL_SERVER_ERROR );
         }
-
     }
 
-    /**
-    * Get budgets by user ID.
+    /*
+    * Get all expenses for the authenticated user.
     */
 
-    public function getBudgetsByUserId(): JsonResponse {
+    public function index(): JsonResponse {
         try {
             $userId = auth()->id();
-            $budgets = $this->budgetService->getBudgetsByUserId( $userId );
+            $expenses = $this->expenseService->getExpensesByUser( $userId );
 
             return response()->json( [
                 'success' => true,
-                'data' => $budgets,
-                'message' => empty( $budgets ) ? 'No budgets found' : 'Budgets fetched successfully',
+                'data' => $expenses,
+                'message' => empty( $expense ) ? 'Expenses fetched successfully' : 'No expenses found',
             ], Response::HTTP_OK );
-        } catch( Exception $e ) {
+        } catch ( Exception $e ) {
             return response()->json( [
                 'success' => false,
-                'message' => 'Failed to retrieve budgets',
+                'message' => 'Failed to retrieve expenses',
                 'error' => config( 'app.debug' ) ? $e->getMessage() : null
             ], Response::HTTP_INTERNAL_SERVER_ERROR );
         }
-
     }
 }

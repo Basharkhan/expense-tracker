@@ -16,10 +16,10 @@ class BudgetService {
         }
 
         $data[ 'user_id' ] = $userId;
-        return $this->budgetRepository->createBudget( $data );
+        return $this->budgetRepository->create( $data );
     }
 
     public function getBudgetsByUserId( int $userId ): array {
-        return $this->budgetRepository->getBudgetsByUserId( $userId );
+        return $this->budgetRepository->findBudgetsByUser( $userId );
     }
 }
