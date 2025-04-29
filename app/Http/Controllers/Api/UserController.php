@@ -71,19 +71,36 @@ class UserController extends Controller {
     * Update user
     */
 
-    public function update( Request $request, $id ): JsonResponse {
+    public function update( Request $request, int $id ): JsonResponse {
         try {
+
+            $user = $this->userService->getUserById( $id );
+
+            if ( !$user ) {
+                return response()->json( [
+                    'success' => false,
+                    'message' => 'User not found',
+                ], Response::HTTP_NOT_FOUND );
+            }
+
+            if ( auth()->id() !== $id ) {
+                return response()->json( [
+                    'success' => false,
+                    'message' => 'You are not authorized to update this user',
+                ], Response::HTTP_FORBIDDEN );
+            }
+
             $validatedData = $request->validate( [
                 'name' => 'sometimes|required|string|max:255',
                 'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
                 'password' => 'sometimes|required|string|min:6',
             ] );
 
-            $updatedUser = $this->userService->updateUser( $id, $validatedData );
+            $user = $this->userService->updateUser( $id, $validatedData );
 
             return response()->json( [
                 'success' => true,
-                'data' => $updatedUser,
+                'data' => $user,
                 'message' => 'User updated successfully',
             ] );
 
@@ -106,9 +123,25 @@ class UserController extends Controller {
     * Delete user
     */
 
-    public function destroy( $id ): JsonResponse {
+    public function destroy( int $id ): JsonResponse {
 
         try {
+            $user = $this->userService->getUserById( $id );
+
+            if ( !$user ) {
+                return response()->json( [
+                    'success' => false,
+                    'message' => 'User not found',
+                ], Response::HTTP_NOT_FOUND );
+            }
+
+            if ( auth()->id() !== $id ) {
+                return response()->json( [
+                    'success' => false,
+                    'message' => 'You are not authorized to delete this user',
+                ], Response::HTTP_FORBIDDEN );
+            }
+
             $result = $this->userService->deleteUser( $id );
 
             if ( !$result ) {

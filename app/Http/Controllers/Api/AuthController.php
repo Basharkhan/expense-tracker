@@ -99,6 +99,11 @@ class AuthController extends Controller {
     public function logout( Request $request ) {
         try {
             $request->user()->currentAccessToken()->delete();
+
+            return response()->json( [
+                'success' => true,
+                'message' => 'User logged out successfully',
+            ], Response::HTTP_OK );
         } catch ( \Exception $e ) {
             return response()->json( [
                 'success' => false,

@@ -54,7 +54,7 @@ class BudgetController extends Controller {
     * Get budgets by user ID.
     */
 
-    public function getBudgetsByUserId(): JsonResponse {
+    public function getBudgets(): JsonResponse {
         try {
             $userId = auth()->id();
             $budgets = $this->budgetService->getBudgetsByUserId( $userId );
@@ -73,4 +73,5 @@ class BudgetController extends Controller {
         }
 
     }
+
 }

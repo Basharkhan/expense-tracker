@@ -9,6 +9,10 @@ class BudgetRepository implements BudgetRepositoryInterface {
         return Budget::create( $data );
     }
 
+    public function findById( int $id ): ?Budget {
+        return Budget::find( $id );
+    }
+
     public function existsBudgetForMonth( int $userId, int $month, int $year ): bool {
         return Budget::where( 'user_id', $userId )
         ->where( 'month', $month )
@@ -41,4 +45,5 @@ class BudgetRepository implements BudgetRepositoryInterface {
             );
         }
     }
+
 }

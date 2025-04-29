@@ -18,10 +18,11 @@ Route::middleware( 'auth:sanctum' )->group( function () {
     Route::delete( '/users/{id}', [ UserController::class, 'destroy' ] );
 
     // budgets
-    Route::post('/budgets', [BudgetController::class, 'store'] );
-    Route::get('/budgets', [BudgetController::class, 'getBudgetsByUserId'] );
+    Route::post('/budgets', [BudgetController::class, 'store'] );    
+    Route::get('/budgets', [BudgetController::class, 'getBudgets'] );
 
     // expenses
     Route::post('/expenses', [ExpenseController::class, 'store'] );
     Route::get('/expenses', [ExpenseController::class, 'index'] );
+    Route::delete('/expenses/{id}', [ExpenseController::class, 'delete'] );
 } );

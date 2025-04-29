@@ -73,4 +73,44 @@ class ExpenseController extends Controller {
             ], Response::HTTP_INTERNAL_SERVER_ERROR );
         }
     }
+
+    public function delete( int $id ): JsonResponse {
+        try {
+            $expense = $this->expenseService->getExpenseById( $id );
+
+            if ( empty( $expense ) ) {
+                return response()->json( [
+                    'success' => false,
+                    'message' => 'No expenses found',
+                ], Response::HTTP_NOT_FOUND );
+            }
+
+            if ( auth()->id() !== $expense->user_id ) {
+                return response()->json( [
+                    'success' => false,
+                    'message' => 'You are not authorized to delete this expense',
+                ], Response::HTTP_FORBIDDEN );
+            }
+
+            $result = $this->expenseService->deleteExpense( $id );
+
+            if ( !$result ) {
+                return response()->json( [
+                    'success' => false,
+                    'message' => 'Expense not found or already deleted'
+                ], Response::HTTP_NOT_FOUND );
+            }
+
+            return response()->json( [
+                'success' => true,
+                'message' => 'Expense deleted successfully'
+            ], Response::HTTP_OK );
+        } catch ( Exception $e ) {
+            return response()->json( [
+                'success' => false,
+                'message' => 'Failed to delete expense',
+                'error' => config( 'app.debug' ) ? $e->getMessage() : null
+            ], Response::HTTP_INTERNAL_SERVER_ERROR );
+        }
+    }
 }

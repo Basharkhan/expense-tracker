@@ -19,7 +19,12 @@ class BudgetService {
         return $this->budgetRepository->create( $data );
     }
 
+    public function getBudgetById( int $budgetId ): ?Budget {
+        return $this->budgetRepository->findById( $budgetId );
+    }
+
     public function getBudgetsByUserId( int $userId ): array {
         return $this->budgetRepository->findBudgetsByUser( $userId );
     }
+
 }

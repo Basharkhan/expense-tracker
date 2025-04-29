@@ -13,7 +13,7 @@ class ExpenseService {
 
     public function createExpense( int $userId, array $data ): ?Expense {
         return DB::transaction( function () use ( $userId, $data ) {
-            $month = date( 'm', strtotime( $data[ 'date' ] ) );
+        $month = date( 'm', strtotime( $data[ 'date' ] ) );
         $year = date( 'Y', strtotime( $data[ 'date' ] ) );
         $budget = $this->budgetRepository->findBudgetForMonth( $userId, $month, $year );
 
@@ -33,7 +33,49 @@ class ExpenseService {
         } );        
     }
 
+    // public function updateExpense( int $id, array $data ): ?Expense {
+    //     return DB::transaction( function () use ( $id, $data ) {
+    //     $expense = $this->expenseRepository->findExpenseById( $id );
+    //     if ( !$expense ) {
+    //         throw new \Exception( 'Expense not found.' );
+    //     }
+
+    //     $month = date( 'm', strtotime( $data[ 'date' ] ) );
+    //     $year = date( 'Y', strtotime( $data[ 'date' ] ) );
+    //     $budget = $this->budgetRepository->findBudgetForMonth( $expense->user_id, $month, $year );
+
+    //     if ( !$budget ) {
+    //         throw new \Exception( 'No budget found for the specified month and year.' );
+    //     }
+
+    //     if ( $data[ 'amount' ] > $budget->amount + $expense->amount ) {
+    //         throw new \Exception( 'Expense exceeds the budget amount.' );
+    //     }
+
+    //     // Update the budget amount
+    //     if ( $data[ 'amount' ] != $expense->amount ) {
+    //         if ( $data[ 'amount' ] > $expense->amount ) {
+    //             // Increase budget amount
+    //             $this->budgetRepository->increaseAmount( $budget->id, abs( $data[ 'amount' ] - $expense->amount ) );
+    //         } else {
+    //             // Decrease budget amount
+    //             $this->budgetRepository->decreaseAmount( $budget->id, abs( $data[ 'amount' ] - $expense->amount ) );
+    //         }
+    //     }
+
+    //     return $this->expenseRepository->update( $id, array_merge( [ 'user_id' => $expense->user_id ], $data ) );
+    //     } );        
+    // }
+
     public function getExpensesByUser( int $userId ): array {
         return $this->expenseRepository->findExpensesByUser( $userId );
     }    
+
+    public function deleteExpense( int $id ): bool {
+        return $this->expenseRepository->delete( $id );
+    }
+
+    public function getExpenseById( int $id ): ?Expense {
+        return $this->expenseRepository->findExpenseById( $id );
+    }
 }
