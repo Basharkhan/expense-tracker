@@ -6,6 +6,10 @@ use App\Models\Budget;
 interface BudgetRepositoryInterface {
     public function create( array $data ): ?Budget;
 
+    public function update( int $id, array $data ): ?Budget;
+
+    public function updateAmount( int $id, float $amount ): ?Budget;
+
     public function findById( int $id ): ?Budget;
 
     public function existsBudgetForMonth( int $userId, int $month, int $year ): bool;

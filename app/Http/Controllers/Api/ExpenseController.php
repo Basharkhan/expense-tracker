@@ -51,6 +51,57 @@ class ExpenseController extends Controller {
         }
     }
 
+    /**
+    * Update expense
+    */
+
+    public function update( Request $request, int $id ): JsonResponse {
+        try {
+            $expense = $this->expenseService->getExpenseById( $id );
+
+            if ( empty( $expense ) ) {
+                return response()->json( [
+                    'success' => false,
+                    'message' => 'No expenses found',
+                ], Response::HTTP_NOT_FOUND );
+            }
+
+            if ( auth()->id() !== $expense->user_id ) {
+                return response()->json( [
+                    'success' => false,
+                    'message' => 'You are not authorized to update this expense',
+                ], Response::HTTP_FORBIDDEN );
+            }
+
+            $validatedData = $request->validate( [
+                'amount' => 'required|numeric|min:0|decimal:2|max:99999999.99',
+                'category' => 'required|string|max:255',
+                'date' => 'required|date_format:Y-m-d',
+                'description' => 'nullable|string|max:255',
+            ] );
+
+            $updatedExpense = $this->expenseService->updateExpense( $id, $validatedData );
+
+            return response()->json( [
+                'success' => true,
+                'data' => $updatedExpense,
+                'message' => 'Expense updated successfully',
+            ], Response::HTTP_OK );
+        } catch ( ValidationException $e ) {
+            return response()->json( [
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY );
+        } catch ( Exception $e ) {
+            return response()->json( [
+                'success' => false,
+                'message' => 'Failed to update expense',
+                'error' => config( 'app.debug' ) ? $e->getMessage() : null
+            ], Response::HTTP_INTERNAL_SERVER_ERROR );
+        }
+    }
+
     /*
     * Get all expenses for the authenticated user.
     */
@@ -73,6 +124,10 @@ class ExpenseController extends Controller {
             ], Response::HTTP_INTERNAL_SERVER_ERROR );
         }
     }
+
+    /**
+    * Delete expense
+    */
 
     public function delete( int $id ): JsonResponse {
         try {

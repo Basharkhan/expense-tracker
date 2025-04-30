@@ -9,6 +9,25 @@ class BudgetRepository implements BudgetRepositoryInterface {
         return Budget::create( $data );
     }
 
+    public function update( int $id, array $data ): ?Budget {
+        $budget = Budget::find( $id );
+        if ( $budget ) {
+            $budget->update( $data );
+            return $budget;
+        }
+        return null;
+    }
+
+    public function updateAmount( int $id, float $amount ): ?Budget {
+        $budget = Budget::find( $id );
+        if ( $budget ) {
+            $budget->amount = $amount;
+            $budget->save();
+            return $budget;
+        }
+        return null;
+    }
+
     public function findById( int $id ): ?Budget {
         return Budget::find( $id );
     }
